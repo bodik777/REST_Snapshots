@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import com.bodik.model.Snapshot;
 
 public class SnapshotsDao extends DAO {
-	private final String TABLE_SNAPSHOTS = "snapshotstest";
+	private final String TABLE_SNAPSHOTS = "snapshots";
 	private final String COLUMN_FAMILY = "cf";
 
 	public SnapshotsDao() {
@@ -35,9 +35,9 @@ public class SnapshotsDao extends DAO {
 		ArrayList<Snapshot> rows = new ArrayList<Snapshot>();
 		try {
 			Scan s = getScaner(startRow, stopRow, minStamp, maxStamp);
-			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("Data"));
-			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("UserId"));
-			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("Tags"));
+			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("data"));
+			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("userId"));
+			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("type"));
 
 			ArrayList<String> colList = new ArrayList<String>();
 			ArrayList<String> valList = new ArrayList<String>();
@@ -54,12 +54,11 @@ public class SnapshotsDao extends DAO {
 			for (Result rr : scanner) {
 				rows.add(new Snapshot(Bytes.toString(rr.getRow()), Bytes
 						.toString(rr.getValue(Bytes.toBytes(COLUMN_FAMILY),
-								Bytes.toBytes("Data"))), Bytes.toString(rr
+								Bytes.toBytes("userId"))), Bytes.toString(rr
 						.getValue(Bytes.toBytes(COLUMN_FAMILY),
-								Bytes.toBytes("UserId"))), Bytes.toString(rr
+								Bytes.toBytes("data"))), Bytes.toString(rr
 						.getValue(Bytes.toBytes(COLUMN_FAMILY),
-								Bytes.toBytes("Tags"))), getMaxTimestamp(rr)));
-
+								Bytes.toBytes("type"))), getMaxTimestamp(rr)));
 			}
 			scanner.close();
 		} catch (IOException e) {
@@ -78,12 +77,12 @@ public class SnapshotsDao extends DAO {
 				snapshot = new Snapshot(Bytes.toString(res.getRow()),
 						Bytes.toString(res.getValue(
 								Bytes.toBytes(COLUMN_FAMILY),
-								Bytes.toBytes("Data"))), Bytes.toString(res
+								Bytes.toBytes("userId"))), Bytes.toString(res
 								.getValue(Bytes.toBytes(COLUMN_FAMILY),
-										Bytes.toBytes("UserId"))),
+										Bytes.toBytes("data"))),
 						Bytes.toString(res.getValue(
 								Bytes.toBytes(COLUMN_FAMILY),
-								Bytes.toBytes("Tags"))), getMaxTimestamp(res));
+								Bytes.toBytes("type"))), getMaxTimestamp(res));
 			}
 		} catch (IOException e) {
 			Logger.getLogger(SnapshotsDao.class).error(
@@ -95,13 +94,13 @@ public class SnapshotsDao extends DAO {
 	public void putToTable(Snapshot snapshot) {
 		Put p = new Put(Bytes.toBytes(snapshot.getRowkey()));
 		try {
-			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("Data"),
+			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("data"),
 					Bytes.toBytes(snapshot.getData()));
 			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY),
-					Bytes.toBytes("UserId"),
+					Bytes.toBytes("userId"),
 					Bytes.toBytes(snapshot.getUserId()));
-			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("Tags"),
-					Bytes.toBytes(snapshot.getTags()));
+			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("type"),
+					Bytes.toBytes(snapshot.getType()));
 			tables.put(p);
 		} catch (IOException e) {
 			Logger.getLogger(SnapshotsDao.class)
