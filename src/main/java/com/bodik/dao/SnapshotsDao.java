@@ -9,7 +9,6 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 
@@ -38,17 +37,6 @@ public class SnapshotsDao extends DAO {
 			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("data"));
 			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("userId"));
 			s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("type"));
-
-			ArrayList<String> colList = new ArrayList<String>();
-			ArrayList<String> valList = new ArrayList<String>();
-			colList.add("Tags");
-			valList.add(fTag1);
-			colList.add("Tags");
-			valList.add(fTag2);
-			FilterList flMaster = getFilter(COLUMN_FAMILY, colList, valList);
-			if (flMaster.hasFilterRow()) {
-				s.setFilter(flMaster);
-			}
 
 			ResultScanner scanner = tables.getScanner(s);
 			for (Result rr : scanner) {
