@@ -1,5 +1,8 @@
 package com.bodik.model;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class Snapshot {
 	private String rowkey;
 	private String userId;
@@ -34,14 +37,6 @@ public class Snapshot {
 		this.rowkey = rowkey;
 	}
 
-	public String getData() {
-		return data;
-	}
-
-	public void setData(String data) {
-		this.data = data;
-	}
-
 	public String getUserId() {
 		return userId;
 	}
@@ -58,12 +53,39 @@ public class Snapshot {
 		this.type = type;
 	}
 
+	public String getData() {
+		return this.data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
+	}
+
 	public Long getTimestamp() {
 		return timestamp;
 	}
 
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	@Override
+	public String toString() {
+		JSONObject result = new JSONObject();
+		if (data.toString().charAt(0) == '{'
+				&& data.toString().charAt(data.toString().length() - 1) == '}') {
+			result.put("data", new JSONObject(this.data));
+		} else if (data.toString().charAt(0) == '['
+				&& data.toString().charAt(data.toString().length() - 1) == ']') {
+			result.put("data", new JSONArray(this.data));
+		} else {
+			result.put("data", this.data);
+		}
+		result.put("type", this.type);
+		result.put("userId", this.userId);
+		result.put("rowkey", this.rowkey);
+		result.put("timestamp", this.timestamp);
+		return result.toString();
 	}
 
 }

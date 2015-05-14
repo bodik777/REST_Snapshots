@@ -52,10 +52,10 @@ public class SnapshotsProductionTest {
 	@Test
 	public void testGetAllParams() {
 		try {
-			ClientRequest request = new ClientRequest(
-					ROOT_URL
-							+ "?startRow=1&stopRow=999&minStamp=0&maxStamp=9223372036854775807");// &fCountry=United
-																									// Kingdom&fProduct=Product1");
+			ClientRequest request = new ClientRequest(ROOT_URL
+					+ "?minStamp=0&maxStamp=9223372036854775807");
+			// +"?startRow=1&stopRow=999&minStamp=0&maxStamp=9223372036854775807");
+			// &fCountry=United Kingdom&fProduct=Product1");
 			ClientResponse<String> response = request.get(String.class);
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -78,8 +78,7 @@ public class SnapshotsProductionTest {
 	@Test
 	public final void testGetById() {
 		try {
-			ClientRequest request = new ClientRequest(ROOT_URL
-					+ "/3b628b665557990e3365fdc5f5a50008|45d2bfede10febaf");
+			ClientRequest request = new ClientRequest(ROOT_URL + "/testRow");
 			ClientResponse<String> response = request.get(String.class);
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -96,35 +95,92 @@ public class SnapshotsProductionTest {
 			assertTrue(status == 200);
 			assertEquals(
 					res,
-					"{\"rowkey\":\"3b628b665557990e3365fdc5f5a50008|45d2bfede10febaf\",\"userId\":\"902074\",\"type\":\"snapshot\",\"data\":\"{\\\"location\\\":\\\"wpjxmrb\\\",\\\"place\\\":\\\"dnoe\\\",\\\"struct\\\":\\\"bxrgwulq\\\",\\\"param\\\":\\\"ttorbsod\\\"}\",\"timestamp\":1431000990656}");
+					"{\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key1\":\"val1\",\"test2\":\"val2\"}],\"rowkey\":\"testRow\",\"type\":\"snapshot\",\"userId\":\"TestUserID\",\"timestamp\":1431594548213}");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	public final void testCreateRow() {
+	public final void testCreateRowDataIsString() {
 		try {
 			ClientRequest request = new ClientRequest(ROOT_URL);
 			request.accept("application/json");
-			String input = "{\"rowkey\":\"testRow\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":\"{\\\"key1\\\":\\\"val1\\\",\\\"test2\\\":\\\"val2\\\"}\"}";
-			//{\"key1\":\"val1\",\"test2\":\"val2\"}
-			request.body("application/json", input);
 
+			String input = "{\"rowkey\":\"testRowString\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":\"Some data\"}";
+			request.body("application/json", input);
 			ClientResponse<String> response = request.post(String.class);
 			int status = response.getStatus();
-
-			System.out.println("Request Transactions - putToTable: Status: "
-					+ status
-					+ (status == 200 ? "; Request success!"
-							: "; Request failed!"));
+			System.out
+					.println("Request Transactions - putToTable String data: Status: "
+							+ status
+							+ (status == 200 ? "; Request success!"
+									: "; Request failed!"));
 			assertTrue(status == 200);
 
 			Connection connection = ConnectionFactory
 					.createConnection(HBaseConnection.getConf());
 			Table tables = connection.getTable(TableName.valueOf(TABLE_NAME));
 			List<Delete> list = new ArrayList<Delete>();
-			Delete del = new Delete(Bytes.toBytes("testRow"));
+			Delete del = new Delete(Bytes.toBytes("testRowString"));
+			list.add(del);
+			tables.delete(list);
+			assertTrue("Deleting success!", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public final void testCreateRowDataIsJSONObject() {
+		try {
+			ClientRequest request = new ClientRequest(ROOT_URL);
+			request.accept("application/json");
+			String input = "{\"rowkey\":\"testRowJSONObject\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":{\"key1\":\"val1\",\"test2\":\"val2\"}}";
+			request.body("application/json", input);
+			ClientResponse<String> response = request.post(String.class);
+			int status = response.getStatus();
+			System.out
+					.println("Request Transactions - putToTable JSONObject data: Status: "
+							+ status
+							+ (status == 200 ? "; Request success!"
+									: "; Request failed!"));
+			assertTrue(status == 200);
+
+			Connection connection = ConnectionFactory
+					.createConnection(HBaseConnection.getConf());
+			Table tables = connection.getTable(TableName.valueOf(TABLE_NAME));
+			List<Delete> list = new ArrayList<Delete>();
+			Delete del = new Delete(Bytes.toBytes("testRowJSONObject"));
+			list.add(del);
+			tables.delete(list);
+			assertTrue("Deleting success!", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public final void testCreateRowDataIsJSONArray() {
+		try {
+			ClientRequest request = new ClientRequest(ROOT_URL);
+			request.accept("application/json");
+			String input = "{\"rowkey\":\"testRowJsonArray\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key11\":\"val11\",\"test12\":\"val12\"}]}";
+			request.body("application/json", input);
+			ClientResponse<String> response = request.post(String.class);
+			int status = response.getStatus();
+			System.out
+					.println("Request Transactions - putToTable JSONArray data: Status: "
+							+ status
+							+ (status == 200 ? "; Request success!"
+									: "; Request failed!"));
+			assertTrue(status == 200);
+
+			Connection connection = ConnectionFactory
+					.createConnection(HBaseConnection.getConf());
+			Table tables = connection.getTable(TableName.valueOf(TABLE_NAME));
+			List<Delete> list = new ArrayList<Delete>();
+			Delete del = new Delete(Bytes.toBytes("testRowJsonArray"));
 			list.add(del);
 			tables.delete(list);
 			assertTrue("Deleting success!", true);
