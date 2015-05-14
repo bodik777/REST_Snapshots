@@ -1,6 +1,7 @@
 package com.bodik.model;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Snapshot {
@@ -72,19 +73,23 @@ public class Snapshot {
 	@Override
 	public String toString() {
 		JSONObject result = new JSONObject();
-		if (data.toString().charAt(0) == '{'
-				&& data.toString().charAt(data.toString().length() - 1) == '}') {
-			result.put("data", new JSONObject(this.data));
-		} else if (data.toString().charAt(0) == '['
-				&& data.toString().charAt(data.toString().length() - 1) == ']') {
-			result.put("data", new JSONArray(this.data));
-		} else {
-			result.put("data", this.data);
-		}
 		result.put("type", this.type);
 		result.put("userId", this.userId);
 		result.put("rowkey", this.rowkey);
 		result.put("timestamp", this.timestamp);
+		try {
+			if (data.toString().charAt(0) == '{'
+					&& data.toString().charAt(data.toString().length() - 1) == '}') {
+				result.put("data", new JSONObject(this.data));
+			} else if ((data.toString().charAt(0) == '[' && data.toString()
+					.charAt(data.toString().length() - 1) == ']')) {
+				result.put("data", new JSONArray(this.data));
+			} else {
+				result.put("data", this.data);
+			}
+		} catch (JSONException e) {
+			result.put("data", this.data);
+		}
 		return result.toString();
 	}
 
