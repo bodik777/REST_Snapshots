@@ -1,14 +1,12 @@
 package com.bodik.model;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
 
 public class Snapshot {
 	private String rowkey;
 	private String userId;
 	private String type;
-	private String data;
+	private Object data;
 	private Long timestamp;
 
 	public Snapshot() {
@@ -21,13 +19,6 @@ public class Snapshot {
 		this.userId = userId;
 		this.type = type;
 		this.timestamp = timestamp;
-	}
-
-	public Snapshot(String rowkey, String userId, String data, String type) {
-		this.rowkey = rowkey;
-		this.data = data;
-		this.userId = userId;
-		this.type = type;
 	}
 
 	public String getRowkey() {
@@ -54,11 +45,16 @@ public class Snapshot {
 		this.type = type;
 	}
 
-	public String getData() {
-		return this.data;
+	public Object getData() {
+		try {
+			return new ObjectMapper().readValue(this.data.toString(),
+					Object.class);
+		} catch (Exception e) {
+			return this.data;
+		}
 	}
 
-	public void setData(String data) {
+	public void setData(Object data) {
 		this.data = data;
 	}
 
@@ -69,28 +65,4 @@ public class Snapshot {
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
 	}
-
-	@Override
-	public String toString() {
-		JSONObject result = new JSONObject();
-		result.put("type", this.type);
-		result.put("userId", this.userId);
-		result.put("rowkey", this.rowkey);
-		result.put("timestamp", this.timestamp);
-		try {
-			if (data.toString().charAt(0) == '{'
-					&& data.toString().charAt(data.toString().length() - 1) == '}') {
-				result.put("data", new JSONObject(this.data));
-			} else if ((data.toString().charAt(0) == '[' && data.toString()
-					.charAt(data.toString().length() - 1) == ']')) {
-				result.put("data", new JSONArray(this.data));
-			} else {
-				result.put("data", this.data);
-			}
-		} catch (JSONException e) {
-			result.put("data", this.data);
-		}
-		return result.toString();
-	}
-
 }

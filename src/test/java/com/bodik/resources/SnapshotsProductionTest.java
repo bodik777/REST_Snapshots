@@ -95,7 +95,7 @@ public class SnapshotsProductionTest {
 			assertTrue(status == 200);
 			assertEquals(
 					res,
-					"{\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key1\":\"val1\",\"test2\":\"val2\"}],\"rowkey\":\"testRow\",\"type\":\"snapshot\",\"userId\":\"TestUserID\",\"timestamp\":1431595888345}");
+					"{\"rowkey\":\"testRow\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key1\":\"val1\",\"test2\":\"val2\"}],\"timestamp\":1431613486457}");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
