@@ -24,7 +24,7 @@ import com.bodik.service.HBaseConnection;
 public class SnapshotsProductionTest {
 
 	private final String ROOT_URL = "http://localhost:8080/REST_Snapshots/snapshots";
-	private final String TABLE_NAME = "snapshots";
+	private final String TABLE_NAME = "snapshotstest";
 
 	@Test
 	public final void testGetAll() {
@@ -95,7 +95,7 @@ public class SnapshotsProductionTest {
 			assertTrue(status == 200);
 			assertEquals(
 					res,
-					"{\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key1\":\"val1\",\"test2\":\"val2\"}],\"rowkey\":\"testRow\",\"type\":\"snapshot\",\"userId\":\"TestUserID\",\"timestamp\":1431594548213}");
+					"{\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key1\":\"val1\",\"test2\":\"val2\"}],\"rowkey\":\"testRow\",\"type\":\"snapshot\",\"userId\":\"TestUserID\",\"timestamp\":1431595888345}");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

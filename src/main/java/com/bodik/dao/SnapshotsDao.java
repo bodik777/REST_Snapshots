@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import com.bodik.model.Snapshot;
 
 public class SnapshotsDao extends DAO {
-	private final String TABLE_SNAPSHOTS = "snapshots";
+	private final String TABLE_SNAPSHOTS = "snapshotstest";
 	private final String COLUMN_FAMILY = "cf";
 
 	public SnapshotsDao() {
