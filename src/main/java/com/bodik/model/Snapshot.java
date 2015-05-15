@@ -7,7 +7,6 @@ public class Snapshot {
 	private String rowkey;
 	private String userId;
 	private String type;
-
 	private Object data;
 	private Long timestamp;
 
@@ -73,8 +72,7 @@ public class Snapshot {
 				.append(this.rowkey).append("\",\"userId\":\"")
 				.append(this.userId).append("\",\"type\":\"").append(type)
 				.append("\",\"data\":").append(this.data)
-				.append(",\"timestamp\":\"").append(this.timestamp)
-				.append("\"}");
+				.append(",\"timestamp\":").append(this.timestamp).append("}");
 		return sb.toString();
 	}
 
