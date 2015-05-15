@@ -10,6 +10,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
+
 import com.bodik.dao.SnapshotsDao;
 import com.bodik.model.Snapshot;
 
@@ -41,12 +43,17 @@ public class SnapshotsProduction {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createRow(Snapshot snapshot) {
-		if (snapshot.getRowkey() != null && !snapshot.getRowkey().isEmpty()) {
-			new SnapshotsDao().putToTable(snapshot);
-			return Response.status(200).build();
+	public Response createRow(String request) {
+		Snapshot snapshot;
+		try {
+			snapshot = new ObjectMapper().readValue(request, Snapshot.class);
+			if (snapshot.getRowkey() != null && !snapshot.getRowkey().isEmpty()) {
+				new SnapshotsDao().putToTable(snapshot);
+			}
+		} catch (Exception e) {
+			return Response.status(400).build();
 		}
-		return Response.status(400).entity(snapshot).build();
+		return Response.status(200).build();
 	}
 
 }
