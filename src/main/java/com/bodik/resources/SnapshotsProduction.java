@@ -1,7 +1,5 @@
 package com.bodik.resources;
 
-import java.util.ArrayList;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -20,13 +18,13 @@ public class SnapshotsProduction {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public ArrayList<Snapshot> getAll(@QueryParam("startRow") String startRow,
+	public String getAll(@QueryParam("startRow") String startRow,
 			@QueryParam("stopRow") String stopRow,
 			@QueryParam("minStamp") Long minStamp,
 			@QueryParam("maxStamp") Long maxStamp,
 			@QueryParam("fTag1") String fTag1, @QueryParam("fTag2") String fTag2) {
 		return new SnapshotsDao().getAll(startRow, stopRow, minStamp, maxStamp,
-				fTag1, fTag2);
+				fTag1, fTag2).toString();
 	}
 
 	@GET
@@ -37,7 +35,7 @@ public class SnapshotsProduction {
 		if (snapshot == null) {
 			return Response.status(404).build();
 		}
-		return snapshot;
+		return snapshot.toString();
 	}
 
 	@POST

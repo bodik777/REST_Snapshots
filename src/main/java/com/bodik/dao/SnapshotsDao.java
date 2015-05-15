@@ -11,7 +11,6 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import com.bodik.model.Snapshot;
 
@@ -84,7 +83,7 @@ public class SnapshotsDao extends DAO {
 		Put p = new Put(Bytes.toBytes(snapshot.getRowkey()));
 		try {
 			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("data"),
-					new ObjectMapper().writeValueAsBytes(snapshot.getData()));
+					Bytes.toBytes(snapshot.getData().toString()));
 			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY),
 					Bytes.toBytes("userId"),
 					Bytes.toBytes(snapshot.getUserId()));
