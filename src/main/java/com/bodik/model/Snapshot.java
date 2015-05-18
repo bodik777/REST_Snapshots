@@ -1,13 +1,15 @@
 package com.bodik.model;
 
-import org.apache.htrace.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.htrace.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.apache.htrace.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+@JsonDeserialize(using = SnapshotDeserializer.class)
+@JsonSerialize(using = SnapshotSerializer.class)
 public class Snapshot {
 	private String rowkey;
 	private String userId;
 	private String type;
-	private Object data;
+	private String data;
 	private Long timestamp;
 
 	public Snapshot() {
@@ -20,6 +22,13 @@ public class Snapshot {
 		this.userId = userId;
 		this.type = type;
 		this.timestamp = timestamp;
+	}
+
+	public Snapshot(String rowkey, String userId, String data, String type) {
+		this.rowkey = rowkey;
+		this.data = data;
+		this.userId = userId;
+		this.type = type;
 	}
 
 	public String getRowkey() {
@@ -46,16 +55,12 @@ public class Snapshot {
 		this.type = type;
 	}
 
-	public Object getData() {
+	public String getData() {
 		return this.data;
 	}
 
-	public void setData(Object data) {
-		try {
-			this.data = new ObjectMapper().writeValueAsString(data);
-		} catch (JsonProcessingException e) {
-			this.data = data;
-		}
+	public void setData(String data) {
+		this.data = data;
 	}
 
 	public Long getTimestamp() {

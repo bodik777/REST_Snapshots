@@ -83,7 +83,7 @@ public class SnapshotsDao extends DAO {
 		Put p = new Put(Bytes.toBytes(snapshot.getRowkey()));
 		try {
 			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("data"),
-					Bytes.toBytes(snapshot.getData().toString()));
+					Bytes.toBytes(snapshot.getData()));
 			p.addImmutable(Bytes.toBytes(COLUMN_FAMILY),
 					Bytes.toBytes("userId"),
 					Bytes.toBytes(snapshot.getUserId()));

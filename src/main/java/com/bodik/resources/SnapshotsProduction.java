@@ -10,6 +10,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.htrace.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
 
 import com.bodik.dao.SnapshotsDao;
@@ -24,20 +25,26 @@ public class SnapshotsProduction {
 			@QueryParam("stopRow") String stopRow,
 			@QueryParam("minStamp") Long minStamp,
 			@QueryParam("maxStamp") Long maxStamp,
-			@QueryParam("fTag1") String fTag1, @QueryParam("fTag2") String fTag2) {
-		return new SnapshotsDao().getAll(startRow, stopRow, minStamp, maxStamp,
-				fTag1, fTag2).toString();
+			@QueryParam("fTag1") String fTag1, @QueryParam("fTag2") String fTag2)
+			throws JsonProcessingException {
+		// return new SnapshotsDao().getAll(startRow, stopRow, minStamp,
+		// maxStamp,
+		// fTag1, fTag2);
+		return new ObjectMapper().writeValueAsString(new SnapshotsDao().getAll(
+				startRow, stopRow, minStamp, maxStamp, fTag1, fTag2));
 	}
 
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getById(@PathParam("id") String id) {
+	public Object getById(@PathParam("id") String id)
+			throws JsonProcessingException {
 		Snapshot snapshot = new SnapshotsDao().getById(id);
 		if (snapshot == null) {
 			return Response.status(404).build();
 		}
-		return snapshot.toString();
+		return new ObjectMapper().writeValueAsString(snapshot);
+		// return snapshot.toString();
 	}
 
 	@POST
