@@ -24,7 +24,7 @@ public class HBaseConnection {
 					"HBase is not running!", e);
 		} catch (Exception e) {
 			Logger.getLogger(HBaseConnection.class).error(
-					"Could not connect to the table!", e);
+					"Could not connect to HBase!", e);
 		}
 	}
 

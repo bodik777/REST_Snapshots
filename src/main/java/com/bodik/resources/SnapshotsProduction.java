@@ -1,5 +1,8 @@
 package com.bodik.resources;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -8,6 +11,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.htrace.fasterxml.jackson.core.JsonProcessingException;
@@ -16,23 +20,25 @@ import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
 import com.bodik.dao.SnapshotsDao;
 import com.bodik.model.Snapshot;
 
-@Path("snapshots")
+@Path("/snapshots")
 public class SnapshotsProduction {
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public String getAll(@QueryParam("startRow") String startRow,
-			@QueryParam("stopRow") String stopRow,
-			@QueryParam("minStamp") Long minStamp,
-			@QueryParam("maxStamp") Long maxStamp,
-			@QueryParam("fTag1") String fTag1, @QueryParam("fTag2") String fTag2)
-			throws JsonProcessingException {
-		// return new SnapshotsDao().getAll(startRow, stopRow, minStamp,
-		// maxStamp,
-		// fTag1, fTag2);
-		return new ObjectMapper().writeValueAsString(new SnapshotsDao().getAll(
-				startRow, stopRow, minStamp, maxStamp, fTag1, fTag2));
-	}
+//	@GET
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public ArrayList<Snapshot> getAll(@QueryParam("startRow") String startRow,
+//			@QueryParam("stopRow") String stopRow,
+//			@QueryParam("minStamp") Long minStamp,
+//			@QueryParam("maxStamp") Long maxStamp,
+//			@QueryParam("fTags") String fTags
+//	// ,MultivaluedMap<String, String> params
+//	) {
+//		// return new ObjectMapper().writeValueAsString(new
+//		// SnapshotsDao().getAll(
+//		// startRow, stopRow, minStamp, maxStamp, fTags));//
+//		// params.get("fTags").get(0)));
+//		return new SnapshotsDao().getAll(startRow, stopRow, minStamp, maxStamp,
+//				fTags);
+//	}
 
 	@GET
 	@Path("{id}")
@@ -44,8 +50,8 @@ public class SnapshotsProduction {
 			return Response.status(404).build();
 		}
 		return new ObjectMapper().writeValueAsString(snapshot);
-		// return snapshot.toString();
 	}
+	
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)

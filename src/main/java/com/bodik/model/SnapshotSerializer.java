@@ -11,13 +11,10 @@ public class SnapshotSerializer extends JsonSerializer<Snapshot> {
 	public void serialize(Snapshot snapshot, JsonGenerator jsonGenerator,
 			SerializerProvider serializerProvider) throws IOException {
 		jsonGenerator.writeStartObject();
-
 		jsonGenerator.writeStringField("rowkey", snapshot.getRowkey());
 		jsonGenerator.writeStringField("userId", snapshot.getUserId());
 		jsonGenerator.writeStringField("type", snapshot.getType());
-
 		jsonGenerator.writeRaw(",\"data\":" + snapshot.getData());
-
 		jsonGenerator.writeNumberField("timestamp", snapshot.getTimestamp());
 		jsonGenerator.writeEndObject();
 	}
