@@ -1,7 +1,6 @@
 package com.bodik.resources;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -11,11 +10,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.htrace.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Logger;
 
 import com.bodik.dao.SnapshotsDao;
 import com.bodik.model.Snapshot;
@@ -23,22 +22,18 @@ import com.bodik.model.Snapshot;
 @Path("/snapshots")
 public class SnapshotsProduction {
 
-//	@GET
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public ArrayList<Snapshot> getAll(@QueryParam("startRow") String startRow,
-//			@QueryParam("stopRow") String stopRow,
-//			@QueryParam("minStamp") Long minStamp,
-//			@QueryParam("maxStamp") Long maxStamp,
-//			@QueryParam("fTags") String fTags
-//	// ,MultivaluedMap<String, String> params
-//	) {
-//		// return new ObjectMapper().writeValueAsString(new
-//		// SnapshotsDao().getAll(
-//		// startRow, stopRow, minStamp, maxStamp, fTags));//
-//		// params.get("fTags").get(0)));
-//		return new SnapshotsDao().getAll(startRow, stopRow, minStamp, maxStamp,
-//				fTags);
-//	}
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getAll(@QueryParam("startRow") String startRow,
+			@QueryParam("stopRow") String stopRow,
+			@QueryParam("minStamp") Long minStamp,
+			@QueryParam("maxStamp") Long maxStamp,
+			@QueryParam("fTagK") ArrayList<String> fTagsK,
+			@QueryParam("fTagV") ArrayList<String> fTagsV)
+			throws JsonProcessingException {
+		return new ObjectMapper().writeValueAsString(new SnapshotsDao().getAll(
+				startRow, stopRow, minStamp, maxStamp, fTagsK, fTagsV));
+	}
 
 	@GET
 	@Path("{id}")
@@ -51,7 +46,6 @@ public class SnapshotsProduction {
 		}
 		return new ObjectMapper().writeValueAsString(snapshot);
 	}
-	
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -64,6 +58,8 @@ public class SnapshotsProduction {
 				new SnapshotsDao().putToTable(snapshot);
 			}
 		} catch (Exception e) {
+			Logger.getLogger(SnapshotsDao.class)
+					.error("Error adding entry!", e);
 			return Response.status(400).build();
 		}
 		return Response.status(200).build();

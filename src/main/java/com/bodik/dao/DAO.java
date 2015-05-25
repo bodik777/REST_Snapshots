@@ -1,8 +1,7 @@
 package com.bodik.dao;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.ArrayList;
 
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.Connection;
@@ -31,7 +30,7 @@ public class DAO {
 		}
 	}
 
-	protected Scan getScaner(String startRow, String stopRow, Long minStamp,
+	protected Scan getScanner(String startRow, String stopRow, Long minStamp,
 			Long maxStamp) {
 		Scan s = null;
 		try {
@@ -50,17 +49,19 @@ public class DAO {
 				s.setStopRow(Bytes.toBytes(stopRow));
 			}
 		} catch (IOException e) {
-			Logger.getLogger(DAO.class).error("Failed to extract data!", e);
+			Logger.getLogger(DAO.class)
+					.error("Failed to configure scanner!", e);
 		}
 		return s;
 	}
 
-	protected FilterList getFilter(HashMap<String, String> tags) {
+	protected FilterList getFilter(ArrayList<String> fTagsK,
+			ArrayList<String> fTagsV) {
 		FilterList flMaster = new FilterList(FilterList.Operator.MUST_PASS_ALL);
-		for (Entry<String, String> tag : tags.entrySet()) {
+		for (int i = 0; i < fTagsK.size(); i++) {
 			StringBuilder sb = new StringBuilder("|");
-			sb.append(Integer.toHexString(tag.getKey().hashCode())).append(
-					Integer.toHexString(tag.getValue().hashCode()));
+			sb.append(Integer.toHexString(fTagsK.get(i).hashCode())).append(
+					Integer.toHexString(fTagsV.get(i).hashCode()));
 			Filter filter = new RowFilter(CompareFilter.CompareOp.EQUAL,
 					new SubstringComparator(sb.toString()));
 			flMaster.addFilter(filter);

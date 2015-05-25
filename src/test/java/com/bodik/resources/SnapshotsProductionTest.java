@@ -32,17 +32,20 @@ public class SnapshotsProductionTest {
 			ClientRequest request = new ClientRequest(ROOT_URL);
 			ClientResponse<String> response = request.get(String.class);
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new ByteArrayInputStream(response.getEntity().getBytes())));
-			String temp;
-			String res = "";
+			// BufferedReader br = new BufferedReader(new InputStreamReader(
+			// new ByteArrayInputStream(response.getEntity().getBytes())));
+			// String temp;
+			// String res = "";
+			// System.out.println("Request Transactions - getAll: Status: "
+			// + response.getStatus() + "; Output ->");
+			// while ((temp = br.readLine()) != null) {
+			// res += temp;
+			// }
+			// System.out.println(res);
 			System.out.println("Request Transactions - getAll: Status: "
-					+ response.getStatus() + "; Output ->");
-			while ((temp = br.readLine()) != null) {
-				res += temp;
-			}
-			System.out.println(res);
-
+					+ response.getStatus()
+					+ (response.getStatus() == 200 ? "; Request success!"
+							: "; Request failed!"));
 			assertTrue(response.getStatus() == 200);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -52,23 +55,26 @@ public class SnapshotsProductionTest {
 	@Test
 	public void testGetAllParams() {
 		try {
-			ClientRequest request = new ClientRequest(ROOT_URL
-					+ "?minStamp=0&maxStamp=9223372036854775807");
-			// +"?startRow=1&stopRow=999&minStamp=0&maxStamp=9223372036854775807");
-			// &fCountry=United Kingdom&fProduct=Product1");
+			ClientRequest request = new ClientRequest(
+					ROOT_URL
+							+ "?minStamp=0&maxStamp=9223372036854775807&startRow=t&stopRow=u");
+			// &fTagK=testk1&fTagV=testv1");
 			ClientResponse<String> response = request.get(String.class);
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new ByteArrayInputStream(response.getEntity().getBytes())));
-			String temp;
-			String res = "";
+			// BufferedReader br = new BufferedReader(new InputStreamReader(
+			// new ByteArrayInputStream(response.getEntity().getBytes())));
+			// String temp;
+			// String res = "";
+			// System.out.println("Request Transactions - getAllParams: Status: "
+			// + response.getStatus() + "; Output ->");
+			// while ((temp = br.readLine()) != null) {
+			// res += temp;
+			// }
+			// System.out.println(res);
 			System.out.println("Request Transactions - getAllParams: Status: "
-					+ response.getStatus() + "; Output ->");
-			while ((temp = br.readLine()) != null) {
-				res += temp;
-			}
-			System.out.println(res);
-
+					+ response.getStatus()
+					+ (response.getStatus() == 200 ? "; Request success!"
+							: "; Request failed!"));
 			assertTrue(response.getStatus() == 200);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -78,7 +84,8 @@ public class SnapshotsProductionTest {
 	@Test
 	public final void testGetById() {
 		try {
-			ClientRequest request = new ClientRequest(ROOT_URL + "/testRow");
+			ClientRequest request = new ClientRequest(ROOT_URL
+					+ "/testRow|bbafd944bba63ce2");
 			ClientResponse<String> response = request.get(String.class);
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -95,7 +102,7 @@ public class SnapshotsProductionTest {
 			assertTrue(status == 200);
 			assertEquals(
 					res,
-					"{\"rowkey\":\"testRow\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key1\":\"val1\",\"test2\":\"val2\"}],\"timestamp\":1431700066027}");
+					"{\"rowkey\":\"testRow|bbafd944bba63ce2\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":\"some data\",\"timestamp\":1432562849226}");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -107,7 +114,7 @@ public class SnapshotsProductionTest {
 			ClientRequest request = new ClientRequest(ROOT_URL);
 			request.accept("application/json");
 
-			String input = "{\"rowkey\":\"testRowString\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":\"Some data\"}";
+			String input = "{\"rowkey\":\"testRowString\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":\"Some data\",\"tags\":{\"testkey1\":\"testVal1\"}}";
 			request.body("application/json", input);
 			ClientResponse<String> response = request.post(String.class);
 			int status = response.getStatus();
@@ -122,7 +129,8 @@ public class SnapshotsProductionTest {
 					.createConnection(HBaseConnection.getConf());
 			Table tables = connection.getTable(TableName.valueOf(TABLE_NAME));
 			List<Delete> list = new ArrayList<Delete>();
-			Delete del = new Delete(Bytes.toBytes("testRowString"));
+			Delete del = new Delete(
+					Bytes.toBytes("testRowString|bbafd944bba63ce2"));
 			list.add(del);
 			tables.delete(list);
 			assertTrue("Deleting success!", true);
@@ -136,7 +144,7 @@ public class SnapshotsProductionTest {
 		try {
 			ClientRequest request = new ClientRequest(ROOT_URL);
 			request.accept("application/json");
-			String input = "{\"rowkey\":\"testRowJSONObject\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":{\"key1\":\"val1\",\"test2\":\"val2\"}}";
+			String input = "{\"rowkey\":\"testRowJSONObject\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":{\"key1\":\"val1\",\"test2\":\"val2\"},\"tags\":{\"testkey1\":\"testVal1\"}}";
 			request.body("application/json", input);
 			ClientResponse<String> response = request.post(String.class);
 			int status = response.getStatus();
@@ -151,7 +159,8 @@ public class SnapshotsProductionTest {
 					.createConnection(HBaseConnection.getConf());
 			Table tables = connection.getTable(TableName.valueOf(TABLE_NAME));
 			List<Delete> list = new ArrayList<Delete>();
-			Delete del = new Delete(Bytes.toBytes("testRowJSONObject"));
+			Delete del = new Delete(
+					Bytes.toBytes("testRowJSONObject|bbafd944bba63ce2"));
 			list.add(del);
 			tables.delete(list);
 			assertTrue("Deleting success!", true);
@@ -165,7 +174,7 @@ public class SnapshotsProductionTest {
 		try {
 			ClientRequest request = new ClientRequest(ROOT_URL);
 			request.accept("application/json");
-			String input = "{\"rowkey\":\"testRowJsonArray\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key11\":\"val11\",\"test12\":\"val12\"}]}";
+			String input = "{\"rowkey\":\"testRowJsonArray\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":[{\"key1\":\"val1\",\"test2\":\"val2\"},{\"key11\":\"val11\",\"test12\":\"val12\"}],\"tags\":{\"testkey1\":\"testVal1\"}}";
 			request.body("application/json", input);
 			ClientResponse<String> response = request.post(String.class);
 			int status = response.getStatus();
@@ -180,7 +189,8 @@ public class SnapshotsProductionTest {
 					.createConnection(HBaseConnection.getConf());
 			Table tables = connection.getTable(TableName.valueOf(TABLE_NAME));
 			List<Delete> list = new ArrayList<Delete>();
-			Delete del = new Delete(Bytes.toBytes("testRowJsonArray"));
+			Delete del = new Delete(
+					Bytes.toBytes("testRowJsonArray|bbafd944bba63ce2"));
 			list.add(del);
 			tables.delete(list);
 			assertTrue("Deleting success!", true);

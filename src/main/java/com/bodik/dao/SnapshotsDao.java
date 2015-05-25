@@ -2,7 +2,6 @@ package com.bodik.dao;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.hbase.TableName;
@@ -14,8 +13,6 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.htrace.fasterxml.jackson.core.type.TypeReference;
-import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 
 import com.bodik.model.Snapshot;
@@ -39,48 +36,40 @@ public class SnapshotsDao extends DAO {
 	}
 
 	public ArrayList<Snapshot> getAll(String startRow, String stopRow,
-			Long minStamp, Long maxStamp, String fTags) {
+			Long minStamp, Long maxStamp, ArrayList<String> fTagsK,
+			ArrayList<String> fTagsV) {
 		ArrayList<Snapshot> rows = new ArrayList<Snapshot>();
+		ResultScanner scanner = null;
 		try {
 			try {
-				Scan s = getScaner(startRow, stopRow, minStamp, maxStamp);
+				Scan s = getScanner(startRow, stopRow, minStamp, maxStamp);
 				s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("data"));
 				s.addColumn(Bytes.toBytes(COLUMN_FAMILY),
 						Bytes.toBytes("userId"));
 				s.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes("type"));
-
-				HashMap<String, String> tags = new HashMap<String, String>();
-				ObjectMapper mapper = new ObjectMapper();
-				if (fTags != null) {
-					tags = mapper.readValue(fTags,
-							new TypeReference<HashMap<String, String>>() {
-							});
-					FilterList flMaster = getFilter(tags);
+				if (!fTagsK.isEmpty() && !fTagsV.isEmpty()) {
+					FilterList flMaster = getFilter(fTagsK, fTagsV);
 					s.setFilter(flMaster);
 				}
 
-				ResultScanner scanner = tableSnapshots.getScanner(s);
-				try {
-					for (Result rr : scanner) {
-						rows.add(new Snapshot(Bytes.toString(rr.getRow()),
-								Bytes.toString(rr.getValue(
-										Bytes.toBytes(COLUMN_FAMILY),
-										Bytes.toBytes("userId"))), Bytes
-										.toString(rr.getValue(
-												Bytes.toBytes(COLUMN_FAMILY),
-												Bytes.toBytes("data"))), Bytes
-										.toString(rr.getValue(
-												Bytes.toBytes(COLUMN_FAMILY),
-												Bytes.toBytes("type"))),
-								getMaxTimestamp(rr)));
-					}
-				} finally {
+				scanner = tableSnapshots.getScanner(s);
+				for (Result rr : scanner) {
+					rows.add(new Snapshot(Bytes.toString(rr.getRow()), Bytes
+							.toString(rr.getValue(Bytes.toBytes(COLUMN_FAMILY),
+									Bytes.toBytes("userId"))), Bytes
+							.toString(rr.getValue(Bytes.toBytes(COLUMN_FAMILY),
+									Bytes.toBytes("data"))), Bytes.toString(rr
+							.getValue(Bytes.toBytes(COLUMN_FAMILY),
+									Bytes.toBytes("type"))),
+							getMaxTimestamp(rr)));
+				}
+			} finally {
+				if (scanner != null) {
 					scanner.close();
 				}
-
-			} finally {
-				if (tableSnapshots != null)
+				if (tableSnapshots != null) {
 					tableSnapshots.close();
+				}
 				connection.close();
 			}
 		} catch (IOException e) {
@@ -90,55 +79,32 @@ public class SnapshotsDao extends DAO {
 		return rows;
 	}
 
-	// public Snapshot getById(String id) {
-	// Snapshot snapshot = null;
-	// Get query = new Get(id.getBytes());
-	// try {
-	// try {
-	// Result res = tableSnapshots.get(query);
-	// if (!res.isEmpty()) {
-	// snapshot = new Snapshot(Bytes.toString(res.getRow()),
-	// Bytes.toString(res.getValue(
-	// Bytes.toBytes(COLUMN_FAMILY),
-	// Bytes.toBytes("userId"))),
-	// Bytes.toString(res.getValue(
-	// Bytes.toBytes(COLUMN_FAMILY),
-	// Bytes.toBytes("data"))), Bytes.toString(res
-	// .getValue(Bytes.toBytes(COLUMN_FAMILY),
-	// Bytes.toBytes("type"))),
-	// getMaxTimestamp(res));
-	// }
-	// } catch (IOException e) {
-	// Logger.getLogger(SnapshotsDao.class).error(
-	// "Failed to extract data!", e);
-	// } finally {
-	// // if (tableSnapshots != null) {
-	// // tableSnapshots.close();
-	// // }
-	// connection.close();
-	// }
-	// } catch (IOException e) {
-	// Logger.getLogger(SnapshotsDao.class).error(
-	// "Failed to extract data!", e);
-	// }
-	// return snapshot;
-	// }
-
 	public Snapshot getById(String id) {
 		Snapshot snapshot = null;
 		Get query = new Get(id.getBytes());
 		try {
-			Result res = tableSnapshots.get(query);
-			if (!res.isEmpty()) {
-				snapshot = new Snapshot(Bytes.toString(res.getRow()),
-						Bytes.toString(res.getValue(
-								Bytes.toBytes(COLUMN_FAMILY),
-								Bytes.toBytes("userId"))), Bytes.toString(res
-								.getValue(Bytes.toBytes(COLUMN_FAMILY),
-										Bytes.toBytes("data"))),
-						Bytes.toString(res.getValue(
-								Bytes.toBytes(COLUMN_FAMILY),
-								Bytes.toBytes("type"))), getMaxTimestamp(res));
+			try {
+				Result res = tableSnapshots.get(query);
+				if (!res.isEmpty()) {
+					snapshot = new Snapshot(Bytes.toString(res.getRow()),
+							Bytes.toString(res.getValue(
+									Bytes.toBytes(COLUMN_FAMILY),
+									Bytes.toBytes("userId"))),
+							Bytes.toString(res.getValue(
+									Bytes.toBytes(COLUMN_FAMILY),
+									Bytes.toBytes("data"))), Bytes.toString(res
+									.getValue(Bytes.toBytes(COLUMN_FAMILY),
+											Bytes.toBytes("type"))),
+							getMaxTimestamp(res));
+				}
+			} catch (IOException e) {
+				Logger.getLogger(SnapshotsDao.class).error(
+						"Failed to extract data!", e);
+			} finally {
+				if (tableSnapshots != null) {
+					tableSnapshots.close();
+				}
+				connection.close();
 			}
 		} catch (IOException e) {
 			Logger.getLogger(SnapshotsDao.class).error(
@@ -147,9 +113,8 @@ public class SnapshotsDao extends DAO {
 		return snapshot;
 	}
 
-	public void putToTable(Snapshot snapshot) {
+	public void putToTable(Snapshot snapshot) throws IOException {
 		try {
-			// try {
 			tableTags = super.connection
 					.getTable(TableName.valueOf(TABLE_TAGS));
 			StringBuilder rowKey = new StringBuilder(snapshot.getRowkey());
@@ -177,16 +142,12 @@ public class SnapshotsDao extends DAO {
 			sn.addImmutable(Bytes.toBytes(COLUMN_FAMILY),
 					Bytes.toBytes("type"), Bytes.toBytes(snapshot.getType()));
 			tableSnapshots.put(sn);
-			// } finally {
-			// if (tableSnapshots != null)
-			// tableSnapshots.close();
-			// if (tableTags != null)
-			// tableTags.close();
-			// connection.close();
-			// }
-		} catch (IOException e) {
-			Logger.getLogger(SnapshotsDao.class)
-					.error("Error adding entry!", e);
+		} finally {
+			if (tableSnapshots != null)
+				tableSnapshots.close();
+			if (tableTags != null)
+				tableTags.close();
+			connection.close();
 		}
 	}
 
