@@ -8,12 +8,13 @@ import org.apache.log4j.Logger;
 
 public class HBaseConnection {
 	private static Configuration config;
+
 	static {
-		PropertyLoader loader = new PropertyLoader();
-		String ipDB = loader.getIpDB();
+		PropertyLoader prop = new PropertyLoader();
+		String ipDB = prop.getIpDB();
 		config = HBaseConfiguration.create();
 		config.set("hbase.zookeeper.quorum", ipDB);
-		config.set("hbase.zookeeper.property.clientPort", loader.getPortDB());
+		config.set("hbase.zookeeper.property.clientPort", prop.getPortDB());
 		config.set("zookeeper.znode.parent", "/hbase-unsecure");
 		config.set("hbase.master", ipDB + ":60000");
 		config.set("hbase.cluster.distributed", "true");

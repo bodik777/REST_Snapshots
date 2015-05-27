@@ -38,18 +38,19 @@ public class SnapshotsProduction {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getById(@PathParam("id") String id)
+	public Response getById(@PathParam("id") String id)
 			throws JsonProcessingException {
 		Snapshot snapshot = new SnapshotsDao().getById(id);
 		if (snapshot == null) {
 			return Response.status(404).build();
 		}
-		return new ObjectMapper().writeValueAsString(snapshot);
+		return Response.status(200)
+				.entity(new ObjectMapper().writeValueAsString(snapshot))
+				.build();
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response createRow(String request) {
 		Snapshot snapshot;
 		try {

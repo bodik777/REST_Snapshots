@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.FilterList;
@@ -16,18 +14,9 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 
-import com.bodik.service.HBaseConnection;
-
 public class DAO {
-	protected Connection connection;
 
-	protected DAO() {
-		try {
-			connection = ConnectionFactory.createConnection(HBaseConnection
-					.getConf());
-		} catch (IOException e) {
-			Logger.getLogger(DAO.class).error("Could not connect to HBase!", e);
-		}
+	public DAO() {
 	}
 
 	protected Scan getScanner(String startRow, String stopRow, Long minStamp,
