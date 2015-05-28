@@ -22,9 +22,8 @@ public class SnapshotDeserializer extends JsonDeserializer<Snapshot> {
 				node.get("tags").toString(),
 				new TypeReference<HashMap<String, String>>() {
 				});
-		Snapshot sn = new Snapshot(node.get("rowkey").textValue(), node.get(
-				"userId").textValue(), node.get("data").toString(), tags, node
-				.get("type").textValue());
+		Snapshot sn = new Snapshot(node.get("userId").textValue(), node.get(
+				"data").toString(), tags, node.get("type").textValue());
 		return sn;
 	}
 }

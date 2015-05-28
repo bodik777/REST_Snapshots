@@ -24,15 +24,19 @@ public class SnapshotsProduction {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getAll(@QueryParam("startRow") String startRow,
+	public Response getAll(@QueryParam("startRow") String startRow,
 			@QueryParam("stopRow") String stopRow,
 			@QueryParam("minStamp") Long minStamp,
 			@QueryParam("maxStamp") Long maxStamp,
 			@QueryParam("fTagK") ArrayList<String> fTagsK,
 			@QueryParam("fTagV") ArrayList<String> fTagsV)
 			throws JsonProcessingException {
-		return new ObjectMapper().writeValueAsString(new SnapshotsDao().getAll(
-				startRow, stopRow, minStamp, maxStamp, fTagsK, fTagsV));
+		return Response
+				.status(200)
+				.entity(new ObjectMapper()
+						.writeValueAsString(new SnapshotsDao().getAll(startRow,
+								stopRow, minStamp, maxStamp, fTagsK, fTagsV)))
+				.build();
 	}
 
 	@GET

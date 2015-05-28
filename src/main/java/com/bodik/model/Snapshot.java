@@ -2,6 +2,7 @@ package com.bodik.model;
 
 import java.util.HashMap;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.htrace.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.htrace.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -27,9 +28,11 @@ public class Snapshot {
 		this.timestamp = timestamp;
 	}
 
-	public Snapshot(String rowkey, String userId, String data,
-			HashMap<String, String> tags, String type) {
-		this.rowkey = rowkey;
+	public Snapshot(String userId, String data, HashMap<String, String> tags,
+			String type) {
+		this.rowkey = DigestUtils.md5Hex(new StringBuffer("userId:\"")
+				.append(userId).append("\"; type:\"").append(type)
+				.append("\"; data:").append(data).append(";").toString());
 		this.data = data;
 		this.userId = userId;
 		this.tags = tags;
@@ -61,19 +64,11 @@ public class Snapshot {
 	}
 
 	public String getData() {
-		return this.data;
+		return data;
 	}
 
 	public void setData(String data) {
 		this.data = data;
-	}
-
-	public Long getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(Long timestamp) {
-		this.timestamp = timestamp;
 	}
 
 	public HashMap<String, String> getTags() {
@@ -82,6 +77,14 @@ public class Snapshot {
 
 	public void setTags(HashMap<String, String> tags) {
 		this.tags = tags;
+	}
+
+	public Long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 }

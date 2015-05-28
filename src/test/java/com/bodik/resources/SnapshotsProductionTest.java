@@ -102,7 +102,7 @@ public class SnapshotsProductionTest {
 			assertTrue(status == 200);
 			assertEquals(
 					res,
-					"{\"rowkey\":\"testRow|bbafd944bba63ce2\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":\"some data\",\"timestamp\":1432562849226}");
+					"{\"rowkey\":\"testRow|bbafd944bba63ce2\",\"userId\":\"TestUserID\",\"type\":\"snapshot\",\"data\":\"some data\",\"timestamp\":1432817609593}");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
