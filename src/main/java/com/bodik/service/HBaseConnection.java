@@ -15,7 +15,7 @@ public class HBaseConnection {
 		config = HBaseConfiguration.create();
 		config.set("hbase.zookeeper.quorum", ipDB);
 		config.set("hbase.zookeeper.property.clientPort", prop.getPortDB());
-		config.set("zookeeper.znode.parent", "/hbase-unsecure");
+		config.set("zookeeper.znode.parent", "/hbase"); //hbase-unsecure
 		config.set("hbase.master", ipDB + ":60000");
 		config.set("hbase.cluster.distributed", "true");
 		try {
